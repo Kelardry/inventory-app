@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">InventoryApp</string>
+    <string name="shelf_count">Shelves: %d</string>
+</resources>

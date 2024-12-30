@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/itemDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/itemLocation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textStyle="italic" />
+
+    <TextView
+        android:id="@+id/itemDetails"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/amountDetails"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/expirationDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/itemComments"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textStyle="italic"
+        android:visibility="gone"
+        android:layout_marginTop="4dp" />
+
+    <TextView
+        android:id="@+id/itemTags"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
+</LinearLayout>

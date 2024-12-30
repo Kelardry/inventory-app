@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Inventory App"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Version 1.0.0"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Last Updated: December 30, 2024"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:layout_marginBottom="24dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Purpose"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="This app helps you track items stored in your freezers, refrigerators, pantries, and other storage spaces. Keep track of what you have, where it's stored, and when it expires."
+            android:textSize="16sp"
+            android:layout_marginBottom="24dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Features"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• Manage multiple storage devices and their shelves\n• Track item quantities and expiration dates\n• Filter and search functionality\n• Tag-based organization\n• Network file synchronization\n• Automatic sorting"
+            android:textSize="16sp"
+            android:layout_marginBottom="24dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Credits"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="App Development:\nOriginal concept and implementation by Kelardry\n\nCode Contributions:\nEnhanced with assistance from Claude (Anthropic)\n\nGraphics:\nImages generated with craiyon.com were edited to create the main icon"
+            android:textSize="16sp"
+            android:layout_marginBottom="16dp"/>
+
+    </LinearLayout>
+</ScrollView>

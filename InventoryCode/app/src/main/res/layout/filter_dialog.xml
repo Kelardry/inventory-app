@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+
+    <!-- Tag filter -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tag:"
+        android:textStyle="bold"/>
+
+    <Spinner
+        android:id="@+id/tagFilter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- Quantity filters -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Min Quantity:"
+                android:textStyle="bold"/>
+
+            <EditText
+                android:id="@+id/quantityMinFilter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:hint="Min" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Max Quantity:"
+                android:textStyle="bold"/>
+
+            <EditText
+                android:id="@+id/quantityMaxFilter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:hint="Max" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Date Added Filters -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Date Added Range:"
+            android:textStyle="bold"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp">
+
+                <EditText
+                    android:id="@+id/date_added_min"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="From (MM/YYYY)"
+                    android:inputType="text"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp">
+
+                <EditText
+                    android:id="@+id/date_added_max"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="To (MM/YYYY)"
+                    android:inputType="text"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Expiration Date Filters -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Expiration Date Range:"
+            android:textStyle="bold"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp">
+
+                <EditText
+                    android:id="@+id/exp_date_min"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="From (MM/YYYY)"
+                    android:inputType="text"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp">
+
+                <EditText
+                    android:id="@+id/exp_date_max"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="To (MM/YYYY)"
+                    android:inputType="text"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp">
+
+        <Button
+            android:id="@+id/applyFiltersButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Apply Filters"/>
+
+        <Button
+            android:id="@+id/clearFiltersButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Clear Filters"/>
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Instructions"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="24dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Getting Started"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="1. Add your first storage device (freezer, fridge, etc.)\n2. Add shelves to organize items within the device\n3. Start adding items to your inventory"
+            android:textSize="16sp"
+            android:layout_marginBottom="24dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Managing Storage Devices"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• Press 'Add New Device' to create a storage device\n• Tap a device to manage its shelves\n• Add, rename, reorder, and delete shelves as needed\n• Devices and shelves can't be deleted if they contain items"
+            android:textSize="16sp"
+            android:layout_marginBottom="24dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Working with Items"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Adding Items:\n• Press '+' to add a new item\n• Select the storage device and shelf\n• Enter description, quantity, and other details\n• Optional: add expiration date, tags, and comments\n\nEditing Items:\n• Tap any item to view options\n• Choose to edit, duplicate, or delete\n• All changes are saved automatically\n\nTip: When a device or shelf is filtered, new items will default to that location"
+            android:textSize="16sp"
+            android:layout_marginBottom="24dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Finding Items"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Quick Filter:\n• Use the device dropdown at the top\n• Use the search bar to find items by description\n\nAdvanced Filtering:\n• Tap the filter icon for more options\n• Filter by tags or quantity\n• Filter by date added or expiration date\n\nNote: Items are always automatically sorted by device, shelf, and description"
+            android:textSize="16sp"
+            android:layout_marginBottom="24dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Syncing Your Data"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Inventory Sync:\n• Tap the sync button on the main screen\n• Choose or create a CSV file\n• Select whether to push data to network or pull from network\n\nDevice Sync:\n• Use 'Sync Devices' in device management\n• Choose or create a JSON file\n• Select sync direction\n\nTip: Regular syncing helps maintain a backup of your data"
+            android:textSize="16sp"
+            android:layout_marginBottom="24dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tips and Tricks"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• Use tags to group related items across different locations\n• The optional amount field can specify weights or volumes\n• Duplicate items to quickly add similar entries\n• Comments can store cooking instructions or other notes\n• Check expiration dates regularly using the date filters"
+            android:textSize="16sp"/>
+
+    </LinearLayout>
+</ScrollView>
