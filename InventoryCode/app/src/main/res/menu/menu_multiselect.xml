@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_move_selected"
+        android:title="Move"
+        android:icon="@android:drawable/ic_menu_send"
+        android:showAsAction="always" />
+    <item
+        android:id="@+id/action_delete_selected"
+        android:title="Delete"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:showAsAction="always" />
+</menu>

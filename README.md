@@ -1,7 +1,7 @@
 # Inventory App
 Android app for inventory of food in freezers or other devices.  
-Version 1.0.0  
-Last Updated: December 30, 2024  
+Version 1.0.1  
+Last Updated: August 2, 2026
 
 ## About
 

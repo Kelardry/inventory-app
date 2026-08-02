@@ -59,7 +59,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Adding Items:\n• Press '+' to add a new item\n• Select the storage device and shelf\n• Enter description, quantity, and other details\n• Optional: add expiration date, tags, and comments\n\nEditing Items:\n• Tap any item to view options\n• Choose to edit, duplicate, or delete\n• All changes are saved automatically\n\nTip: When a device or shelf is filtered, new items will default to that location"
+            android:text="Adding Items:\n• Press '+' to add a new item\n• Select the storage device and shelf\n• Enter description, quantity, and other details\n• Optional: add expiration date, tags, and comments\n\nEditing Items:\n• Tap any item to view options\n• Choose to edit, duplicate, or delete\n• All changes are saved automatically\n\nSelecting Multiple Items:\n• Long-press an item to start selection mode\n• Tap more items to add them to the selection\n• A toolbar appears at the top showing the count\n• Use Delete to remove every selected item at once\n• Use Move to send all selected items to a different device and shelf\n• Press the back button or check mark to exit selection mode\n\nTip: When a device or shelf is filtered, new items will default to that location"
             android:textSize="16sp"
             android:layout_marginBottom="24dp"/>
 
@@ -89,7 +89,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Inventory Sync:\n• Tap the sync button on the main screen\n• Choose or create a CSV file\n• Select whether to push data to network or pull from network\n\nDevice Sync:\n• Use 'Sync Devices' in device management\n• Choose or create a JSON file\n• Select sync direction\n\nTip: Regular syncing helps maintain a backup of your data"
+            android:text="Inventory Sync:\n• Tap the sync button on the main screen\n• Browse to your inventory CSV file (e.g. in Google Drive)\n• The sync menu shows the file name once it has been picked\n• Choose 'Push to Network' to upload your local changes\n• Choose 'Pull from Network' to download the latest version\n• Choose 'Choose Different File...' to switch files\n• Choose 'Share File Info...' to send the file name to another device (each device has to browse to the file the first time)\n\nDevice Sync:\n• Use 'Sync Devices' in device management\n• Choose or create a JSON file\n• Select sync direction\n\nTips:\n• Regular syncing helps maintain a backup of your data\n• File URIs are tied to one device — share the file name and have each device browse to it in Drive separately"
             android:textSize="16sp"
             android:layout_marginBottom="24dp"/>
 

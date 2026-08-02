@@ -3,14 +3,21 @@ package com.example.inventoryapp;
 // MainActivity.java
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.icu.util.Calendar;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.OpenableColumns;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.SparseBooleanArray;
+import android.view.ActionMode;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
@@ -47,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText quantityMinFilter, quantityMaxFilter;
     private List<StorageDevice> devices;
     private StorageDevice selectedDevice;
+    private ActionMode actionMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         setupListViewClickListener();
+        setupMultiSelectMode();
     }
 
 
@@ -286,30 +295,49 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void showSyncDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Sync Options");
-
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         currentNetworkPath = prefs.getString(PREF_INVENTORY_PATH, null);
 
         if (currentNetworkPath == null) {
-            builder.setMessage("Please select a network file first")
+            new AlertDialog.Builder(this)
+                    .setTitle("Sync")
+                    .setMessage("No sync file selected yet. Browse to pick the inventory CSV file in Google Drive (or wherever it lives).")
                     .setPositiveButton("Browse", (dialog, id) -> browseLANFile())
-                    .setNegativeButton("Cancel", null);
-            builder.create().show();
+                    .setNegativeButton("Cancel", null)
+                    .show();
             return;
         }
 
-        // Show current path and confirm or change
-        builder.setMessage("Current network file:\n" + currentNetworkPath)
-                .setPositiveButton("Use This File", (dialog, id) -> {
-                    showSyncDirectionDialog();
+        String fileName = getDisplayNameForUri(Uri.parse(currentNetworkPath));
+        String title = fileName != null ? "Sync: " + fileName : "Sync";
+
+        String[] options = {
+                "Push to Network (upload to file)",
+                "Pull from Network (download from file)",
+                "Choose Different File...",
+                "Share File Info..."
+        };
+
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setItems(options, (dialog, which) -> {
+                    switch (which) {
+                        case 0:
+                            syncToNetwork();
+                            break;
+                        case 1:
+                            syncFromNetwork();
+                            break;
+                        case 2:
+                            browseLANFile();
+                            break;
+                        case 3:
+                            showFileInfoDialog();
+                            break;
+                    }
                 })
-                .setNegativeButton("Browse New File", (dialog, id) -> {
-                    browseLANFile();
-                })
-                .setNeutralButton("Cancel", null);
-        builder.create().show();
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     private void showSyncDirectionDialog() {
@@ -326,6 +354,59 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
         builder.create().show();
+    }
+
+    private String getDisplayNameForUri(Uri uri) {
+        if (uri == null) return null;
+        try (Cursor cursor = getContentResolver().query(uri, null, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                int idx = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                if (idx >= 0) {
+                    return cursor.getString(idx);
+                }
+            }
+        } catch (Exception e) {
+            // Provider may not support querying; fall through.
+        }
+        return null;
+    }
+
+    private void showFileInfoDialog() {
+        if (currentNetworkPath == null) {
+            Toast.makeText(this, "No sync file selected", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Uri uri = Uri.parse(currentNetworkPath);
+        String fileName = getDisplayNameForUri(uri);
+        final String displayName = fileName != null ? fileName : "(unknown name)";
+
+        String message = "File name: " + displayName + "\n\n"
+                + "Note: the raw URI below only works on this device. To use the same file "
+                + "on another device, search for the file name above in Google Drive on that "
+                + "device, then open it from this app's Sync menu.\n\n"
+                + "Raw URI:\n" + currentNetworkPath;
+
+        new AlertDialog.Builder(this)
+                .setTitle("Sync File Info")
+                .setMessage(message)
+                .setPositiveButton("Share", (d, w) -> {
+                    Intent share = new Intent(Intent.ACTION_SEND);
+                    share.setType("text/plain");
+                    share.putExtra(Intent.EXTRA_SUBJECT, "Freezer inventory file");
+                    share.putExtra(Intent.EXTRA_TEXT,
+                            "Freezer inventory file: " + displayName
+                                    + "\n\nFind this file in Google Drive on your device, then open it from the inventory app's Sync menu.");
+                    startActivity(Intent.createChooser(share, "Share file name"));
+                })
+                .setNeutralButton("Copy URI", (d, w) -> {
+                    ClipboardManager cm = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                    if (cm != null) {
+                        cm.setPrimaryClip(ClipData.newPlainText("Inventory URI", currentNetworkPath));
+                        Toast.makeText(this, "URI copied to clipboard", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Close", null)
+                .show();
     }
 
     private void browseLANFile() {
@@ -358,7 +439,9 @@ public class MainActivity extends AppCompatActivity {
         if (currentNetworkPath != null) {
             try {
                 Uri uri = Uri.parse(currentNetworkPath);
-                OutputStream outputStream = getContentResolver().openOutputStream(uri);
+                // "wt" = write + truncate. Some providers (Google Drive) do not truncate
+                // with the default "w" mode, which leaves stale rows behind after deletes/edits.
+                OutputStream outputStream = getContentResolver().openOutputStream(uri, "wt");
                 if (outputStream != null) {
                     FileHandler.saveInventory(inventory, outputStream);
                     Toast.makeText(this, "Successfully synced to network",
@@ -649,6 +732,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void applyFiltersAndSort() {
+        // Changing the adapter contents invalidates ListView choice-mode positions; end
+        // any in-progress multi-select so the user isn't acting on stale selections.
+        if (actionMode != null) {
+            actionMode.finish();
+        }
+
         ArrayList<FreezerItem> filteredList = new ArrayList<>();
         for (FreezerItem item : inventory) {
             if (currentFilter.matches(item)) {
@@ -657,8 +746,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         Collections.sort(filteredList);
-        adapter = new FreezerItemAdapter(this, filteredList);
-        listView.setAdapter(adapter);
+        // Mutate the existing adapter in place so the ListView keeps its choice-mode
+        // state and we avoid re-binding the adapter on every keystroke.
+        adapter.clear();
+        adapter.addAll(filteredList);
+        adapter.notifyDataSetChanged();
     }
 
     private FreezerDate parseDateString(String dateStr) {
@@ -1039,11 +1131,182 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupListViewClickListener() {
         listView.setOnItemClickListener((parent, view, position, id) -> {
+            // In multi-select (action) mode the tap toggles selection — don't open the options dialog.
+            if (actionMode != null) return;
             FreezerItem item = adapter.getItem(position);
             if (item != null) {
                 showItemOptionsDialog(item);
             }
         });
+    }
+
+    private void setupMultiSelectMode() {
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        listView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                MenuInflater inflater = mode.getMenuInflater();
+                inflater.inflate(R.menu.menu_multiselect, menu);
+                actionMode = mode;
+                updateActionModeTitle(mode);
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                int id = item.getItemId();
+                if (id == R.id.action_delete_selected) {
+                    confirmDeleteSelected(mode);
+                    return true;
+                } else if (id == R.id.action_move_selected) {
+                    showMoveSelectedDialog(mode);
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+                actionMode = null;
+            }
+
+            @Override
+            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+                updateActionModeTitle(mode);
+            }
+        });
+    }
+
+    private void updateActionModeTitle(ActionMode mode) {
+        int count = listView.getCheckedItemCount();
+        mode.setTitle(count + " selected");
+    }
+
+    private List<FreezerItem> getSelectedItems() {
+        List<FreezerItem> selected = new ArrayList<>();
+        SparseBooleanArray checked = listView.getCheckedItemPositions();
+        if (checked == null) return selected;
+        for (int i = 0; i < checked.size(); i++) {
+            if (checked.valueAt(i)) {
+                int pos = checked.keyAt(i);
+                if (pos >= 0 && pos < adapter.getCount()) {
+                    FreezerItem item = adapter.getItem(pos);
+                    if (item != null) {
+                        selected.add(item);
+                    }
+                }
+            }
+        }
+        return selected;
+    }
+
+    private void confirmDeleteSelected(ActionMode mode) {
+        final List<FreezerItem> selected = getSelectedItems();
+        if (selected.isEmpty()) {
+            mode.finish();
+            return;
+        }
+        String msg = selected.size() == 1
+                ? "Delete \"" + selected.get(0).getDescription() + "\"?"
+                : "Delete " + selected.size() + " items?";
+        new AlertDialog.Builder(this)
+                .setTitle("Delete Items")
+                .setMessage(msg)
+                .setPositiveButton("Delete", (d, w) -> {
+                    inventory.removeAll(selected);
+                    saveLocalInventory();
+                    applyFiltersAndSort();
+                    Toast.makeText(this, selected.size() + " item(s) deleted",
+                            Toast.LENGTH_SHORT).show();
+                    mode.finish();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void showMoveSelectedDialog(ActionMode mode) {
+        final List<FreezerItem> selected = getSelectedItems();
+        if (selected.isEmpty()) {
+            mode.finish();
+            return;
+        }
+        if (devices == null || devices.isEmpty()) {
+            Toast.makeText(this, "No devices configured", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_move_items, null);
+        final Spinner deviceSpinner = dialogView.findViewById(R.id.moveDeviceSpinner);
+        final Spinner shelfSpinner = dialogView.findViewById(R.id.moveShelfSpinner);
+
+        final List<StorageDevice> sortedDevices = new ArrayList<>(devices);
+        Collections.sort(sortedDevices);
+
+        final ArrayList<String> deviceNames = new ArrayList<>();
+        for (StorageDevice d : sortedDevices) deviceNames.add(d.getName());
+        ArrayAdapter<String> deviceAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, deviceNames);
+        deviceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        deviceSpinner.setAdapter(deviceAdapter);
+
+        deviceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                List<String> shelves = (position >= 0 && position < sortedDevices.size())
+                        ? sortedDevices.get(position).getShelves()
+                        : new ArrayList<>();
+                ArrayAdapter<String> sa = new ArrayAdapter<>(MainActivity.this,
+                        android.R.layout.simple_spinner_item, shelves);
+                sa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                shelfSpinner.setAdapter(sa);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        // If all selected items share a device, preselect it; same for shelf.
+        String commonDevice = null;
+        for (FreezerItem it : selected) {
+            if (commonDevice == null) commonDevice = it.getDevice();
+            else if (!commonDevice.equals(it.getDevice())) { commonDevice = null; break; }
+        }
+        if (commonDevice != null) {
+            int idx = deviceNames.indexOf(commonDevice);
+            if (idx >= 0) deviceSpinner.setSelection(idx);
+        }
+
+        String countLabel = selected.size() == 1 ? "1 item" : selected.size() + " items";
+
+        new AlertDialog.Builder(this)
+                .setTitle("Move " + countLabel)
+                .setView(dialogView)
+                .setPositiveButton("Move", (d, w) -> {
+                    if (deviceSpinner.getSelectedItem() == null
+                            || shelfSpinner.getSelectedItem() == null) {
+                        Toast.makeText(this, "Pick a device and shelf",
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    String newDevice = deviceSpinner.getSelectedItem().toString();
+                    String newShelf = shelfSpinner.getSelectedItem().toString();
+                    for (FreezerItem it : selected) {
+                        it.setDevice(newDevice);
+                        it.setShelf(newShelf);
+                    }
+                    saveLocalInventory();
+                    applyFiltersAndSort();
+                    Toast.makeText(this, "Moved " + selected.size() + " item(s)",
+                            Toast.LENGTH_SHORT).show();
+                    mode.finish();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     private void showItemOptionsDialog(FreezerItem item) {
@@ -1090,32 +1353,29 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, "Item duplicated", Toast.LENGTH_SHORT).show();
     }
 
-    // Helper method to create description for duplicate item
+    // Helper method to create description for duplicate item.
+    // Tolerates legacy "X- Copy" (no space) and current "X - Copy" forms when detecting siblings.
     private String createDuplicateDescription(String originalDesc) {
-        if (originalDesc.matches(".*- Copy(\\s+\\d+)?$")) {
-            // If already has "- Copy" or "- Copy X", increment number
+        Pattern copySuffix = Pattern.compile("\\s*-\\s*Copy(\\s+\\d+)?$");
+        Matcher suffixMatcher = copySuffix.matcher(originalDesc);
+        if (suffixMatcher.find()) {
             int copyNum = 2;
-            String baseDesc = originalDesc.replaceAll("- Copy(\\s+\\d+)?$", "").trim();
+            String baseDesc = originalDesc.substring(0, suffixMatcher.start()).trim();
 
-            // Find highest existing copy number
-            Pattern pattern = Pattern.compile(Pattern.quote(baseDesc) + "- Copy(\\s+\\d+)?$");
+            Pattern siblingPattern = Pattern.compile(
+                    Pattern.quote(baseDesc) + "\\s*-\\s*Copy(\\s+(\\d+))?$");
             for (FreezerItem item : inventory) {
-                String desc = item.getDescription();
-                if (pattern.matcher(desc).matches()) {
-                    Matcher matcher = Pattern.compile("\\d+$").matcher(desc);
-                    if (matcher.find()) {
-                        copyNum = Math.max(copyNum, Integer.parseInt(matcher.group()) + 1);
-                    } else {
-                        copyNum = Math.max(copyNum, 2);
-                    }
+                Matcher m = siblingPattern.matcher(item.getDescription());
+                if (m.matches()) {
+                    String num = m.group(2);
+                    int n = (num != null) ? Integer.parseInt(num) : 1;
+                    copyNum = Math.max(copyNum, n + 1);
                 }
             }
 
-            return String.format("%s- Copy %d", baseDesc, copyNum);
-        } else {
-            // First copy
-            return originalDesc + "- Copy";
+            return String.format("%s - Copy %d", baseDesc, copyNum);
         }
+        return originalDesc + " - Copy";
     }
 
     private void showEditItemDialog(FreezerItem item) {
