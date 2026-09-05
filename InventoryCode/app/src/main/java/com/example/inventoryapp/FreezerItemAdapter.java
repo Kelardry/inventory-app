@@ -8,15 +8,15 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FreezerItemAdapter extends ArrayAdapter<FreezerItem> {
-    private Context context;
-    private ArrayList<FreezerItem> items;
 
-    public FreezerItemAdapter(Context context, ArrayList<FreezerItem> items) {
-        super(context, 0, items);
-        this.context = context;
-        this.items = items;
+    // The caller's list is COPIED, never adopted. ArrayAdapter.clear()/addAll() mutate the
+    // backing list in place, so sharing one list between the adapter and the master inventory
+    // would let a display refresh destroy the real data.
+    public FreezerItemAdapter(Context context, List<FreezerItem> items) {
+        super(context, 0, new ArrayList<>(items));
     }
 
     @Override

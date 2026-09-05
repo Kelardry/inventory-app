@@ -1,7 +1,7 @@
 # Inventory App
 Android app for inventory of food in freezers or other devices.  
-Version 1.0.1  
-Last Updated: August 2, 2026
+Version 1.0.2  
+Last Updated: September 5, 2026
 
 ## About
 
@@ -24,10 +24,25 @@ Enhanced with assistance from Claude (Anthropic)
 #### Graphics:
 Images generated with craiyon.com were edited to create the main icon
 
+## Version History
+### 1.0.2 - September 5, 2026
+- Fixed a search bug that emptied the inventory. The on-screen item list shared its storage with
+  the master inventory, so refreshing the display after a search that matched nothing discarded
+  every item. The first search of a session appeared to work, then later searches and even a
+  cleared search box came up empty, and saving or syncing afterwards could write the emptied
+  list over the CSV file.
+- Syncing from the network, and loading the local file at startup, now re-apply the active search
+  and filters instead of leaving a stale list on screen.
+
 ## Instructions
 ### Installing:
 Download the file inventory-app.apk to your Android device and run it. You might need to enable installing from local files.  
-This is the same file as "inventory-app\InventoryCode\app\release\app-release.apk", just more conveniently located.
+This is a copy of the build output, just more conveniently located; identical copies live at
+"inventory-app\InventoryCode\inventory-app.apk" and
+"inventory-app\InventoryCode\app\release\app-release.apk".
+
+Installing over an existing copy keeps your inventory and device list. You only lose your data
+if you uninstall first, so update in place whenever possible.
 
 ### Getting Started
 1. Add your first storage device (freezer, fridge, etc.)

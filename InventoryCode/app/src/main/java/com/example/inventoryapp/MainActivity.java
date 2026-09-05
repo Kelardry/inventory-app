@@ -74,8 +74,9 @@ public class MainActivity extends AppCompatActivity {
         devices = loadDevices();
         inventory = new ArrayList<>();
 
-        // Set up adapter
-        adapter = new FreezerItemAdapter(this, inventory);
+        // Set up adapter. It holds the *displayed* (filtered) items only — never the master
+        // inventory list, which applyFiltersAndSort() reads from.
+        adapter = new FreezerItemAdapter(this, new ArrayList<>());
         listView.setAdapter(adapter);
 
         // Load inventory
@@ -463,7 +464,7 @@ public class MainActivity extends AppCompatActivity {
                     inventory.clear();
                     inventory.addAll(FileHandler.loadInventory(inputStream));
                     saveLocalInventory(); // Save the new data locally
-                    adapter.notifyDataSetChanged();
+                    applyFiltersAndSort();
                     Toast.makeText(this, "Successfully synced from network",
                             Toast.LENGTH_SHORT).show();
                 }
@@ -480,7 +481,7 @@ public class MainActivity extends AppCompatActivity {
             try (FileInputStream fis = new FileInputStream(file)) {
                 inventory.clear();
                 inventory.addAll(FileHandler.loadInventory(fis));
-                adapter.notifyDataSetChanged();
+                applyFiltersAndSort();
             } catch (IOException e) {
                 Toast.makeText(this, "Error loading local inventory",
                         Toast.LENGTH_SHORT).show();
@@ -530,18 +531,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         dialog.show();
-    }
-
-    private void filterInventory(String query) {
-        ArrayList<FreezerItem> filteredList = new ArrayList<>();
-        for (FreezerItem item : inventory) {
-            if (item.getDescription().toLowerCase().contains(query.toLowerCase()) ||
-                    String.valueOf(item.getShelf()).contains(query)) {
-                filteredList.add(item);
-            }
-        }
-        adapter = new FreezerItemAdapter(this, filteredList);
-        listView.setAdapter(adapter);
     }
 
     private void initializeFilters() {
@@ -738,6 +727,9 @@ public class MainActivity extends AppCompatActivity {
             actionMode.finish();
         }
 
+        // Keep the master list in display order so the saved CSV stays sorted too.
+        Collections.sort(inventory);
+
         ArrayList<FreezerItem> filteredList = new ArrayList<>();
         for (FreezerItem item : inventory) {
             if (currentFilter.matches(item)) {
@@ -745,9 +737,9 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        Collections.sort(filteredList);
         // Mutate the existing adapter in place so the ListView keeps its choice-mode
-        // state and we avoid re-binding the adapter on every keystroke.
+        // state and we avoid re-binding the adapter on every keystroke. This only ever
+        // touches the adapter's own list — `inventory` is never emptied by a filter pass.
         adapter.clear();
         adapter.addAll(filteredList);
         adapter.notifyDataSetChanged();
